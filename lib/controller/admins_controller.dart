@@ -10,6 +10,8 @@ class AdminsController extends GetxController{
         .collection('users')
         .snapshots()
         .listen((event) {
+
+          print('########### Before');
       admins.value = event.docs.where((element) => element['role'] == 'admin').toList();
     });
     return admins.stream;

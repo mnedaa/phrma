@@ -5,9 +5,6 @@ import 'package:flutter/material.dart';
 class AdminHomeController extends GetxController {
   TextEditingController searchBarController = TextEditingController();
 
-
-
-
 }
 
 

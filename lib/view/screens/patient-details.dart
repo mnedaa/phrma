@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pahrma_gb/controller/auth_controller.dart';
@@ -6,8 +7,9 @@ import 'package:pahrma_gb/controller/chat_controller.dart';
 import 'package:pahrma_gb/controller/home_controller.dart';
 import 'package:pahrma_gb/model/user_model.dart';
 import 'package:pahrma_gb/view/screens/admin/show_user_treatment.dart';
-import 'package:pahrma_gb/view/screens/chat_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'chat_screen_two.dart';
 
 class PatientDetails extends GetWidget<HomeController> {
   const PatientDetails({Key? key, required this.userData}) : super(key: key);
@@ -104,9 +106,19 @@ class PatientDetails extends GetWidget<HomeController> {
                                 UserModel.fromJson(userData!).email;
                             print(sender);
                             print(receiver);
-                            ChatController.instance.sender.value = sender;
-                            ChatController.instance.receiver.value = receiver;
-                            Get.to(() => Chat(sender, receiver));
+
+                            Get.to(() => ChatScreen(
+                              senderName: "Admin",
+                                  cinemaID:FirebaseAuth.instance.currentUser!.uid // admin
+                                      ,
+                                  userID:
+                                  UserModel.fromJson(userData!).userId,
+                                  cinema: true,
+                                  receiverName:
+                                      UserModel.fromJson(userData!).name,
+                                  receiverId:
+                                      UserModel.fromJson(userData!).userId,
+                                ));
                           },
                           child: Icon(Icons.message)),
                       ElevatedButton(
