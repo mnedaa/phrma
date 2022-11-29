@@ -52,13 +52,15 @@ import 'package:get/get.dart';
 //   }
 // }
 class TreatmentModel {
-  dynamic id,name, sound, active, image, dose, duration, lastDose, nextDose;
+  dynamic id,name, sound, active, image, totalDose, ended, dose, duration, lastDose, nextDose;
 
 
   TreatmentModel({
     this.id,
     this.name,
     this.dose,
+    this.totalDose,
+    this.ended,
     this.lastDose,
     this.nextDose,
     this.duration,
@@ -71,6 +73,8 @@ class TreatmentModel {
     id = map['id'];
     name = map['name'];
     dose = RxInt(map['dose']);
+    totalDose = map['totalDose'];
+    ended = map['ended'];
     lastDose = Rx(map['lastDose']);
     nextDose = Rx(map['nextDose']);
     duration = RxInt(map['duration']);
@@ -86,6 +90,8 @@ class TreatmentModel {
       'id': id,
       'name': name,
       'dose': dose,
+      'totalDose': totalDose,
+      'ended': ended,
       'lastDose': lastDose,
       'duration': duration,
       'sound': sound,

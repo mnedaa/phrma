@@ -139,10 +139,10 @@ class PatientDetails extends GetWidget<HomeController> {
                             controller.approve(
                                 '${UserModel.fromJson(userData!).userId}');
                           },
-                          child: Text('Approved'),
+                          child: Text('Approve'),
                           style: ButtonStyle(
                               backgroundColor:
-                                  MaterialStateProperty.all<Color>(Colors.red)),
+                                  MaterialStateProperty.all<Color>(Colors.green)),
                         )
                     ],
                   ),

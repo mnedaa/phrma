@@ -1,11 +1,14 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pahrma_gb/constance.dart';
 import '../../../controller/auth_controller.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_selected_card.dart';
 import '../../widgets/custom_text.dart';
 import '../../widgets/custom_text_form_field.dart';
 import 'login.dart';
+import 'dart:io';
 
 class SignUp extends GetWidget<AuthController> {
   const SignUp({Key? key}) : super(key: key);
@@ -37,6 +40,30 @@ class SignUp extends GetWidget<AuthController> {
                 const SizedBox(
                   height: 10,
                 ),
+                InkWell(
+                    onTap: () async {
+                      FilePickerResult? result =
+                          await FilePicker.platform.pickFiles(type: FileType.image);
+                      if (result != null) {
+                        controller.signupImage.value = '${result.files.single.path}';
+                      } else {
+                        // User canceled the picker
+                      }
+                    },
+                    child: Obx(
+                          () => controller.signupImage.value == ''
+                          ? SizedBox(
+                        height: 100,
+                        width: 100,
+                        child: Image.network(maleImage),
+                      )
+                          : SizedBox(
+                        height: 100,
+                        width: 100,
+                        child: Image.file(File(controller.signupImage.value)),
+                      ),
+                    )),
+                SizedBox(height: 10,),
                 CustomTextFormField(
                   labelText: 'Name',
                   hintText: 'example',

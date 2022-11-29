@@ -60,6 +60,13 @@ class UserHome extends GetWidget<UserHomeController> {
                                     // if(TreatmentModel.fromJson(controller.treatment[i]).active == true)
                                     ElevatedButton(
                                         onPressed: () {
+                                          var next = nowDate.add(Duration(
+                                              seconds:
+                                              TreatmentModel.fromJson(
+                                                  controller
+                                                      .treatment[i])
+                                                  .duration
+                                                  .value));
                                           controller.showNotification(
                                               10,
                                               'you should take your dose of treatment $treatmentName now',
@@ -82,42 +89,14 @@ class UserHome extends GetWidget<UserHomeController> {
                                               'treatment': {
                                                 TreatmentModel.fromJson(
                                                         controller.treatment[i])
-                                                    .name: {'active': false}
-                                              }
-                                            }, SetOptions(merge: true));
-                                            FirebaseFirestore.instance
-                                                .collection('users')
-                                                .doc(AuthController.instance
-                                                    .auth.currentUser?.uid)
-                                                .set({
-                                              'treatment': {
-                                                TreatmentModel.fromJson(
-                                                        controller.treatment[i])
                                                     .name: {
-                                                  'dose':
-                                                      FieldValue.increment(-1)
+                                                  'active': false,
+                                                  'dose': FieldValue.increment(-1),
+                                                  'nextDose': next,
                                                 }
                                               }
                                             }, SetOptions(merge: true));
 
-                                            var next = nowDate.add(Duration(
-                                                seconds:
-                                                    TreatmentModel.fromJson(
-                                                            controller
-                                                                .treatment[i])
-                                                        .duration
-                                                        .value));
-                                            FirebaseFirestore.instance
-                                                .collection('users')
-                                                .doc(AuthController.instance
-                                                    .auth.currentUser?.uid)
-                                                .set({
-                                              'treatment': {
-                                                TreatmentModel.fromJson(
-                                                        controller.treatment[i])
-                                                    .name: {'nextDose': next}
-                                              }
-                                            }, SetOptions(merge: true));
                                           } else {
                                             FirebaseFirestore.instance
                                                 .collection('users')
@@ -125,16 +104,10 @@ class UserHome extends GetWidget<UserHomeController> {
                                                     .auth.currentUser?.uid)
                                                 .set({
                                               'history': FieldValue.arrayUnion(
-                                                  [controller.treatment[i]])
-                                            }, SetOptions(merge: true));
-                                            FirebaseFirestore.instance
-                                                .collection('users')
-                                                .doc(AuthController.instance
-                                                    .auth.currentUser?.uid)
-                                                .set({
+                                                  [controller.treatment[i]]),
                                               'treatment': {
                                                 TreatmentModel.fromJson(
-                                                        controller.treatment[i])
+                                                    controller.treatment[i])
                                                     .name: FieldValue.delete()
                                               }
                                             }, SetOptions(merge: true));
@@ -181,7 +154,6 @@ class UserHome extends GetWidget<UserHomeController> {
               accountName: Text('${AuthController.instance.user.value?.displayName}'),
               accountEmail:
                   Text('${AuthController.instance.user.value?.email}'),
-              currentAccountPicture: Image.asset('assets/images/male.png'),
             ),
             ListTile(
               title: Text('Profile'),
@@ -227,3 +199,88 @@ class UserHome extends GetWidget<UserHomeController> {
     );
   }
 }
+
+
+// ElevatedButton(
+// onPressed: () {
+// controller.showNotification(
+// 10,
+// 'you should take your dose of treatment $treatmentName now',
+// TreatmentModel.fromJson(
+// controller.treatment[i])
+//     .sound,
+// index);
+// TreatmentModel.fromJson(
+// controller.treatment[i])
+//     .active = false;
+// if (TreatmentModel.fromJson(
+// controller.treatment[i])
+//     .dose !=
+// 1) {
+// FirebaseFirestore.instance
+//     .collection('users')
+//     .doc(AuthController.instance
+//     .auth.currentUser?.uid)
+//     .set({
+// 'treatment': {
+// TreatmentModel.fromJson(
+// controller.treatment[i])
+//     .name: {'active': false}
+// }
+// }, SetOptions(merge: true));
+// FirebaseFirestore.instance
+//     .collection('users')
+//     .doc(AuthController.instance
+//     .auth.currentUser?.uid)
+//     .set({
+// 'treatment': {
+// TreatmentModel.fromJson(
+// controller.treatment[i])
+//     .name: {
+// 'dose':
+// FieldValue.increment(-1)
+// }
+// }
+// }, SetOptions(merge: true));
+//
+// var next = nowDate.add(Duration(
+// seconds:
+// TreatmentModel.fromJson(
+// controller
+//     .treatment[i])
+//     .duration
+//     .value));
+// FirebaseFirestore.instance
+//     .collection('users')
+//     .doc(AuthController.instance
+//     .auth.currentUser?.uid)
+//     .set({
+// 'treatment': {
+// TreatmentModel.fromJson(
+// controller.treatment[i])
+//     .name: {'nextDose': next}
+// }
+// }, SetOptions(merge: true));
+// } else {
+// FirebaseFirestore.instance
+//     .collection('users')
+//     .doc(AuthController.instance
+//     .auth.currentUser?.uid)
+//     .set({
+// 'history': FieldValue.arrayUnion(
+// [controller.treatment[i]])
+// }, SetOptions(merge: true));
+// FirebaseFirestore.instance
+//     .collection('users')
+//     .doc(AuthController.instance
+//     .auth.currentUser?.uid)
+//     .set({
+// 'treatment': {
+// TreatmentModel.fromJson(
+// controller.treatment[i])
+//     .name: FieldValue.delete()
+// }
+// }, SetOptions(merge: true));
+// }
+// },
+// child: Text('Take Dose'))

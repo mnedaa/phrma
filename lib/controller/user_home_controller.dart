@@ -25,11 +25,6 @@ class UserHomeController extends GetxController {
   RxString chosenImage = ''.obs;
   DateTime now = DateTime.now();
 
-  var user = FirebaseFirestore.instance
-      .collection('users')
-      .doc(AuthController.instance.auth.currentUser?.uid)
-      .get();
-
   var player = AudioPlayer();
 
   pickSound() async {
@@ -56,6 +51,8 @@ class UserHomeController extends GetxController {
     }
   }
 
+  /// Set Notification in Minuets
+
   showNotification(d, String b, sound, var index) {
     var x = index;
     AwesomeNotifications().createNotification(
@@ -80,17 +77,57 @@ class UserHomeController extends GetxController {
       ],
     );
     AwesomeNotifications().setListeners(
-        onActionReceivedMethod: (ReceivedAction receivedAction) async {},
-        onNotificationDisplayedMethod:
+        onActionReceivedMethod: (ReceivedAction receivedAction) async {
+      player.stop();
+    }, onNotificationDisplayedMethod:
             (ReceivedNotification receivedNotification) async {
-          player.setFilePath(sound);
-          player.play();
-        },
-        onDismissActionReceivedMethod: (ReceivedAction receivedAction) async {
-          player.stop();
-          AwesomeNotifications().cancel(receivedAction.id!);
-        });
+      player.setFilePath(sound);
+      player.play();
+    }, onDismissActionReceivedMethod: (ReceivedAction receivedAction) async {
+      player.stop();
+      AwesomeNotifications().cancel(receivedAction.id!);
+    });
   }
+
+  /// Set Notification Hours
+
+  // showNotification(d, String b, sound, var index) {
+  //   var x = index;
+  //   AwesomeNotifications().createNotification(
+  //     content: NotificationContent(
+  //       id: 1,
+  //       channelKey: 'basic_channel',
+  //       title: 'Treatment Reminder',
+  //       body: b,
+  //     ),
+  //     schedule: NotificationInterval(
+  //       interval: d * 60,
+  //       preciseAlarm: true,
+  //     ),
+  //     actionButtons: [
+  //       NotificationActionButton(
+  //           color: Colors.redAccent,
+  //           key: 'cancel',
+  //           label: 'Cancel',
+  //           actionType: ActionType.DismissAction),
+  //       NotificationActionButton(
+  //           key: "snooze", label: "Snooze", color: Colors.red)
+  //     ],
+  //   );
+  //   AwesomeNotifications().setListeners(
+  //       onActionReceivedMethod: (ReceivedAction receivedAction) async {
+  //         player.stop();
+  //       },
+  //       onNotificationDisplayedMethod:
+  //           (ReceivedNotification receivedNotification) async {
+  //         player.setFilePath(sound);
+  //         player.play();
+  //       },
+  //       onDismissActionReceivedMethod: (ReceivedAction receivedAction) async {
+  //         player.stop();
+  //         AwesomeNotifications().cancel(receivedAction.id!);
+  //       });
+  // }
 
   treatmentListStream() {
     FirebaseFirestore.instance
@@ -154,6 +191,8 @@ class UserHomeController extends GetxController {
               treatmentName.text.trim(): {
                 'name': treatmentName.text.trim(),
                 'dose': int.parse(treatmentDose.text.trim()),
+                'totalDose': int.parse(treatmentDose.text.trim()),
+                'ended': false,
                 'image': chosenImage.value,
                 'duration': int.parse(treatmentDuration.text.trim()),
                 'sound': chosenSound.value,
@@ -164,6 +203,11 @@ class UserHomeController extends GetxController {
               }
             }
           }, SetOptions(merge: true));
+          treatmentName.clear();
+          treatmentDuration.clear();
+          treatmentDose.clear();
+          chosenImage.value = '';
+          chosenSound.value = '';
           Get.back();
         },
         onCancel: () {
@@ -189,7 +233,7 @@ class UserHomeController extends GetxController {
                         ? SizedBox(
                             height: 100,
                             width: 100,
-                            child: Image.asset('assets/images/pillLogo.png'),
+                            child: Image.asset('assets/images/pill.jpeg'),
                           )
                         : SizedBox(
                             height: 100,
@@ -229,13 +273,22 @@ class UserHomeController extends GetxController {
               SizedBox(
                 height: 20,
               ),
-              Obx(() => chosenSound.value == ''
-                  ? TextButton(
-                      onPressed: () {
-                        pickSound();
-                      },
-                      child: Text('Select Sound'))
-                  : Text('${chosenSound.value}'.split('/').last)),
+              Obx(
+                () => chosenSound.value == ''
+                    ? TextButton(
+                        onPressed: () {
+                          pickSound();
+                        },
+                        child: Text('Select Sound'))
+                    : TextFormField(
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                            disabledBorder: InputBorder.none,
+                            hintText: '${chosenSound.value}'.split('/').last,
+                            hintStyle: TextStyle(color: Colors.black),
+                            enabled: false),
+                      ),
+              )
             ],
           ),
         ));
@@ -278,11 +331,10 @@ class UserHomeController extends GetxController {
         ));
   }
 
-  signOut()  async{
+  signOut() async {
     await FirebaseAuth.instance.signOut();
     return LogIn();
   }
-
 
   @override
   Future<void> onInit() async {

@@ -25,12 +25,12 @@ class CustomPatientCard extends StatelessWidget {
           color: Colors.blueAccent[800],
           shape: UserModel.fromJson(user!).ban == true
               ? RoundedRectangleBorder(
-                  side: BorderSide(color: Colors.red),
+                  side: BorderSide(color: Colors.red,width: 2),
                   borderRadius: BorderRadius.circular(15))
               : UserModel.fromJson(user!).approved == false ? RoundedRectangleBorder(
-                  side: BorderSide(color: Colors.amber),
+                  side: BorderSide(color: Colors.amber,width: 2),
                   borderRadius: BorderRadius.circular(15)) : RoundedRectangleBorder(
-                  side: BorderSide(color: Colors.green),
+                  side: BorderSide(color: Colors.green,width: 2),
                   borderRadius: BorderRadius.circular(15)),
           elevation: 5,
           child: Padding(
