@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:pahrma_gb/controller/auth_controller.dart';
 import 'package:pahrma_gb/service/binding.dart';
@@ -14,13 +15,13 @@ import 'control_view.dart';
 Future<void> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp();
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
     androidNotificationChannelName: 'Audio playback',
     androidNotificationOngoing: true,
   );
-
   AwesomeNotifications().initialize(
       null,
       [
