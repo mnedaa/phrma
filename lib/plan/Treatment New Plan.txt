@@ -1,0 +1,95 @@
+======================================= Users =======================================
+
+Users : 
+    Admins
+    User
+
+======================================= Pages =======================================
+Targets :
+    # Front-End :
+	    => Register Page                                   
+        => Login Page
+        => Admin Home Page
+        => Admin Setting Page
+        => Current Users Page
+        => Patient Details Page
+        => Patient Home Page
+
+======================================= Tables =======================================
+
+@ Admins
+    => id
+    => name
+    => email
+    => password
+    => gender
+    => phone
+    => photo
+    => online
+    => ban (Boolean)
+
+@ User
+    => id
+    => name
+    => email
+    => password
+    => gender
+    => age
+    => phone
+    => photo
+    => online
+    => online
+    => ban (boolean: false)
+    => approve (boolean: false)
+
+@ Treatment
+    => id
+    => title
+    => photo (nullable)
+    => amount
+    => duration => [days number]
+    => times_per_day
+    => times_of_took (int : default : 0)
+    => finished (boolean : default : false)
+
+@ Treatment_History
+    => id
+    => treatment_id
+    => user_id
+    => date
+
+@ Messages
+    => id
+    => admin_id
+    => user_id
+    => sender ['admin', 'user']
+    => text (nullable)
+    => PDF (nullable)
+
+======================================= Permissions =======================================
+
+@ Admin =>      Can do ?
+            # Make Login                                    Done
+            # Can See Table ( Admins,                       Done
+                                Users,                      Done
+                                Treatments )                Done
+            # Edit his info                                 Done
+            # Create New Admin                              Done
+            # Approve User                                  Done
+            # Can Ban ( Admin, User )                       Done
+            # Delete Treatment                              Done
+            # Whatsapp chat to User                         Done
+            # Contact with User
+
+@ User =>    Can do ?
+            # Make Register And Login                           Done
+            # Can See Table ( his Treatments )                  Done
+            # Edit his info                                     Done
+            # add his treatment                                 Done
+            # edit dose of treatment                            Done
+            # Choose the tone of alarm                          Done
+            # Select notification way                           Done
+                                        (by email,
+                                        via mobile)             Done
+            # Whatsapp chat to Admin                            Done
+            # Contact with Admin
