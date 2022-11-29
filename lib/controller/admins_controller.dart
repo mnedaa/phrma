@@ -5,11 +5,13 @@ class AdminsController extends GetxController{
 
   RxList admins = [].obs;
 
-  streamAdmins() async{
-  await  FirebaseFirestore.instance
+  streamAdmins() {
+      FirebaseFirestore.instance
         .collection('users')
         .snapshots()
         .listen((event) {
+
+          print('########### Before');
       admins.value = event.docs.where((element) => element['role'] == 'admin').toList();
     });
     return admins.stream;

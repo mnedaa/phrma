@@ -1,9 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pahrma_gb/controller/admins_controller.dart';
 import 'package:pahrma_gb/controller/home_controller.dart';
 import 'package:pahrma_gb/model/user_model.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'chat_screen_two.dart';
 
 
 class AdminsList extends GetWidget<AdminsController> {
@@ -39,7 +42,20 @@ class AdminsList extends GetWidget<AdminsController> {
                             Column(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                ElevatedButton(onPressed: (){}, child: Icon(Icons.message)),
+                                ElevatedButton(onPressed: (){
+                                  Get.to(() => ChatScreen(
+                                    senderName: "user",
+                                    cinemaID:UserModel.fromJson(controller.admins[index]).userId
+                                    // admin
+                                    ,
+                                    userID: FirebaseAuth.instance.currentUser!.uid,
+                                    cinema: false,
+                                    receiverName:
+                                    UserModel.fromJson(controller.admins[index]).name,
+                                    receiverId:
+                                    UserModel.fromJson(controller.admins[index]).userId,
+                                  ));
+                                }, child: Icon(Icons.message)),
                                 ElevatedButton(onPressed: (){
                                   Future<void> _launchUrl() async {
                                     if (!await launchUrl(Uri.parse("whatsapp://send?phone=$phoneNum/?text=hi"))) {
