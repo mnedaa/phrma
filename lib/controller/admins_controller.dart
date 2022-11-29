@@ -5,8 +5,8 @@ class AdminsController extends GetxController{
 
   RxList admins = [].obs;
 
-  streamAdmins() async{
-  await  FirebaseFirestore.instance
+  streamAdmins(){
+    FirebaseFirestore.instance
         .collection('users')
         .snapshots()
         .listen((event) {

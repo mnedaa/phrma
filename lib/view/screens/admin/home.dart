@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,6 +8,7 @@ import 'package:pahrma_gb/view/screens/user_profile.dart';
 import 'package:pahrma_gb/view/widgets/custom_patient_card.dart';
 import '../../../constance.dart';
 import '../../../controller/home_controller.dart';
+import 'dart:io';
 
 class Home extends GetWidget<HomeController> {
   const Home({Key? key}) : super(key: key);
@@ -32,7 +34,9 @@ class Home extends GetWidget<HomeController> {
                           borderRadius: BorderRadius.circular(20),
                           borderSide: BorderSide.none)),
                   onChanged: (val) {
-                    controller.check.value == 'users' ? controller.streamUsers(val):controller.streamAdmins(val);
+                    controller.check.value == 'users'
+                        ? controller.streamUsers(val)
+                        : controller.streamAdmins(val);
                   },
                 ),
               ),
@@ -43,101 +47,171 @@ class Home extends GetWidget<HomeController> {
       body: Padding(
         padding: const EdgeInsets.all(10),
         child: Obx(() => Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Text('${controller.check.value}',style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Text(
+                        '${controller.check.value}',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    if (controller.check.value == 'admins')
+                      TextButton(
+                          onPressed: () {
+                            TextEditingController _name =
+                                TextEditingController();
+                            TextEditingController _phone =
+                                TextEditingController();
+                            TextEditingController _email =
+                                TextEditingController();
+                            TextEditingController _password =
+                                TextEditingController();
+                            TextEditingController _age =
+                                TextEditingController();
+                            GlobalKey<FormState> _formKey =
+                                GlobalKey<FormState>();
+                            Get.defaultDialog(
+                                title: 'Edit',
+                                content: Form(
+                                  key: _formKey,
+                                  child: Column(
+                                    children: [
+                                      InkWell(
+                                        onTap: () async {
+                                          FilePickerResult? result =
+                                              await FilePicker.platform
+                                                  .pickFiles(
+                                                      type: FileType.image);
+                                          if (result != null) {
+                                            controller.addAdminImage.value =
+                                                '${result.files.single.path}';
+                                          } else {
+                                            // User canceled the picker
+                                          }
+                                        },
+                                        child: Obx(() =>
+                                            controller.addAdminImage.value == ''
+                                                ? CircleAvatar(
+                                                    child: Image.asset(
+                                                        'assets/images/male.png'),
+                                                    radius: 40,
+                                                  )
+                                                : CircleAvatar(
+                                                    child: Image.file(
+                                                        File(controller.addAdminImage
+                                                            .value)),
+                                                    radius: 40,
+                                                  )),
+                                      ),
+                                      TextFormField(
+                                        controller: _name,
+                                        decoration:
+                                            InputDecoration(hintText: 'Name'),
+                                      ),
+                                      TextFormField(
+                                        controller: _phone,
+                                        decoration:
+                                            InputDecoration(hintText: 'Phone'),
+                                      ),
+                                      TextFormField(
+                                        controller: _email,
+                                        decoration:
+                                            InputDecoration(hintText: 'Email'),
+                                      ),
+                                      TextFormField(
+                                        controller: _password,
+                                        decoration: InputDecoration(
+                                            hintText: 'Password'),
+                                      ),
+                                      TextFormField(
+                                        controller: _age,
+                                        decoration:
+                                            InputDecoration(hintText: 'Age'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                actions: [
+                                  ElevatedButton(
+                                      onPressed: () {
+                                        if (_formKey.currentState?.validate() ==
+                                            true) {
+                                          FirebaseAuth.instance
+                                              .createUserWithEmailAndPassword(
+                                                  email: _email.text.trim(),
+                                                  password:
+                                                      _password.text.trim())
+                                              .then((value) {
+                                            FirebaseFirestore.instance
+                                                .collection('users')
+                                                .doc(value.user?.uid)
+                                                .set({
+                                              'userId': value.user?.uid,
+                                              'name': _name.text.trim(),
+                                              'email': value.user?.email,
+                                              'gender': 'male',
+                                              'age': _age.text.trim(),
+                                              'image': controller.addAdminImage
+                                                          .value ==
+                                                      ''
+                                                  ? 'assets/images/male.png'
+                                                  : controller
+                                                      .addAdminImage.value,
+                                              'phone': _phone.text.trim(),
+                                              'role': 'admin',
+                                              'treatment': [],
+                                              'history': [],
+                                              'ban': false,
+                                              'approved': true,
+                                            }, SetOptions(merge: true));
+                                          });
+                                        }
+                                        _email.clear();
+                                        _password.clear();
+                                        Get.back();
+                                      },
+                                      child: Text('Submit')),
+                                  ElevatedButton(
+                                      onPressed: () {
+                                        _email.clear();
+                                        _password.clear();
+                                        Get.back();
+                                      },
+                                      child: Text('Cancel')),
+                                ]);
+                          },
+                          child: Text('Add Admin +')),
+                  ],
                 ),
-                if(controller.check.value == 'admins')
-                  TextButton(onPressed: (){
-                    TextEditingController _email = TextEditingController();
-                    TextEditingController _password = TextEditingController();
-                    GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-                    Get.defaultDialog(
-                        title: 'Edit',
-                        content: Form(
-                          key: _formKey,
-                          child: Column(
-                            children: [
-                              TextFormField(
-                                controller: _email,
-                                decoration: InputDecoration(
-                                    hintText: 'Email'
-                                ),
-                              ),
-                              TextFormField(
-                                controller: _password,
-                                decoration: InputDecoration(
-                                    hintText: 'Password'
-                                ),
-                              ),
-                            ],
-                          ),
+                controller.check.value == 'users'
+                    ? Expanded(
+                        child: ListView.builder(
+                          itemCount: controller.filterUsers.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return InkWell(
+                                child: CustomPatientCard(
+                              user: controller.filterUsers[index],
+                            ));
+                          },
                         ),
-                        actions: [
-                          ElevatedButton(onPressed: (){
-                            if(_formKey.currentState?.validate() == true){
-                              FirebaseAuth.instance.createUserWithEmailAndPassword(email: _email.text.trim(), password: _password.text.trim()).then((value) {
-                                FirebaseFirestore.instance.
-                                collection('users').
-                                doc(value.user?.uid).set({
-                                  'userId': value.user?.uid,
-                                  'name': 'Admin',
-                                  'email': value.user?.email,
-                                  'gender': 'male',
-                                  'age': '',
-                                  'image': '',
-                                  'phone':'',
-                                  'role': 'admin',
-                                  'treatment':[],
-                                  'history':[],
-                                  'ban':false,
-                                  'approved': true,
-                                },SetOptions(merge: true));
-                              });
-                            }
-                            _email.clear();
-                            _password.clear();
-                            Get.back();
-                          }, child: Text('Submit')),
-                          ElevatedButton(onPressed: (){
-                            _email.clear();
-                            _password.clear();
-                            Get.back();
-                          }, child: Text('Cancel')),
-                        ]
-                    );
-                  }, child: Text('Add Admin +')),
+                      )
+                    : Expanded(
+                        child: ListView.builder(
+                          itemCount: controller.filterAdmins.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return InkWell(
+                                child: CustomPatientCard(
+                              user: controller.filterAdmins[index],
+                            ));
+                          },
+                        ),
+                      )
               ],
-            ),
-            controller.check.value == 'users'
-                ? Expanded(
-                  child: ListView.builder(
-              itemCount: controller.filterUsers.length,
-              itemBuilder: (BuildContext context, int index) {
-                  return InkWell(
-                      child: CustomPatientCard(
-                        user: controller.filterUsers[index],
-                      ));
-              },
-            ),
-                )
-                : Expanded(
-                  child: ListView.builder(
-              itemCount: controller.filterAdmins.length,
-              itemBuilder: (BuildContext context, int index) {
-                  return InkWell(
-                      child: CustomPatientCard(
-                        user: controller.filterAdmins[index],
-                      ));
-              },
-            ),
-                )
-          ],
-        )),
+            )),
       ),
       drawer: Drawer(
         child: Column(
@@ -189,7 +263,7 @@ class Home extends GetWidget<HomeController> {
               elevation: 5,
               child: ListTile(
                 onTap: () {
-                  Get.to(()=> UserProfile());
+                  Get.to(() => UserProfile());
                 },
                 title: Text(
                   'Profile',

@@ -18,43 +18,54 @@ class UserHistory extends GetWidget<HistoryController> {
         title: Text('History'),
         centerTitle: true,
       ),
-      body: Obx(() => ListView.builder(
-        itemCount: controller.historyList.length,
-        itemBuilder: (context, index){
-          var i = TreatmentModel.fromJson(controller.historyList[index]);
-          return SizedBox(
-            height: Get.height * 0.2,
-            width: Get.width * 0.8,
-            child: Card(
-              elevation: 3,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text('Name : ${i.name}'),
-                      Text('Dose : ${i.dose}'),
-                    ],
+      body: Obx(() => controller.historyList.isNotEmpty
+          ? ListView.builder(
+              itemCount: controller.historyList.length,
+              itemBuilder: (context, index) {
+                var i = TreatmentModel.fromJson(controller.historyList[index]);
+                return SizedBox(
+                  height: Get.height * 0.2,
+                  width: Get.width * 0.8,
+                  child: Card(
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text('Name : ${i.name}'),
+                            Text('Dose : ${i.dose}'),
+                          ],
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            CircleAvatar(
+                              child: i.image,
+                              backgroundColor: Colors.transparent,
+                              radius: 40,
+                            ),
+                            Text('${i.dose}')
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      CircleAvatar(child: i.image,backgroundColor: Colors.transparent,radius: 40,),
-                      Text('${i.dose}')
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      )),
+                );
+              },
+            )
+          : Text(
+              'There is No Data !',
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.amber),
+            )),
     );
   }
 }
 
 // reatmentCard(treatment: list[index], dosee: TreatmentModel.fromJson(list[index]).dose)
-
-

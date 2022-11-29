@@ -23,6 +23,7 @@ class AuthController extends GetxController {
   RxBool obscureText = true.obs;
   RxString genderSelected = 'male'.obs;
 
+  RxString signupImage = ''.obs;
   RxString name = ''.obs;
   RxString email = ''.obs;
   RxString password = ''.obs;
@@ -90,7 +91,7 @@ class AuthController extends GetxController {
       'email': email.value,
       'gender': genderSelected.value,
       'age': age.value,
-      'image': image.value,
+      'image': signupImage.value == '' ? image.value : signupImage.value,
       'phone':phone.value,
       'role': 'user',
       'treatment':[],

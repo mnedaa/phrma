@@ -1,7 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pahrma_gb/controller/auth_controller.dart';
 import 'package:pahrma_gb/controller/user_profile_controller.dart';
 import 'package:pahrma_gb/model/user_model.dart';
+import 'dart:io';
 
 
 class UserProfile extends GetWidget<UserProfileController> {
@@ -23,11 +27,27 @@ class UserProfile extends GetWidget<UserProfileController> {
             Expanded(
               child: Obx(() => ListView(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 40),
-                    child: CircleAvatar(
-                      child: UserModel.fromJson(controller.userData).image,
-                      radius: 60,
+                  InkWell(
+                    onTap: () async {
+                      FilePickerResult? result =
+                          await FilePicker.platform.pickFiles(type: FileType.image);
+                      if (result != null) {
+                        File file = File('${result.files.single.path}');
+                        FirebaseFirestore.instance.collection('users').doc(AuthController.instance.auth.currentUser?.uid).set({
+                          'image':file.path
+                        },SetOptions(merge: true));
+                      } else {
+                        // User canceled the picker
+                      }
+
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 40),
+                      child: CircleAvatar(
+                        child: UserModel.fromJson(controller.userData).image,
+                        radius: 60,
+                        backgroundColor: Colors.transparent,
+                      ),
                     ),
                   ),
                   SizedBox(height: 10,),
@@ -35,7 +55,7 @@ class UserProfile extends GetWidget<UserProfileController> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                     elevation: 3,
                     child: ListTile(
-                      onTap: (){controller.edit('name');},
+                      onTap: (){controller.edit('name');AuthController.instance.user.value?.updateDisplayName('${UserModel.fromJson(controller.userData).name}');},
                       title: Text('Name : ${UserModel.fromJson(controller.userData).name}'),
                       trailing: Icon(Icons.edit),
                     ),
@@ -58,32 +78,20 @@ class UserProfile extends GetWidget<UserProfileController> {
                       trailing: Icon(Icons.edit),
                     ),
                   ),
+                  Card(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    elevation: 3,
+                    child: ListTile(
+                      onTap: (){controller.edit('age');},
+                      title: Text('Age : ${UserModel.fromJson(controller.userData).age}'),
+                      trailing: Icon(Icons.edit),
+                    ),
+                  ),
                 ],
               )),
             )
           ],
         ),
-      ),
-    );
-  }
-}
-
-
-class AdminProfile extends GetWidget<UserProfileController> {
-  const AdminProfile({Key? key}) : super(key: key);
-
-
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(UserModel.fromJson(controller.userData).name),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Text('ss'),
       ),
     );
   }

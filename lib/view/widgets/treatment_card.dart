@@ -5,9 +5,9 @@ import 'package:pahrma_gb/controller/auth_controller.dart';
 import 'package:pahrma_gb/controller/treatment_card_controller.dart';
 import 'package:pahrma_gb/model/treatment_model.dart';
 
-
 class TreatmentCard extends GetWidget<TreatmentCardController> {
-  const TreatmentCard({Key? key, required this.treatment, required this.dosee}) : super(key: key);
+  const TreatmentCard({Key? key, required this.treatment, required this.dosee})
+      : super(key: key);
 
   final treatment;
   final RxInt dosee;
@@ -20,7 +20,8 @@ class TreatmentCard extends GetWidget<TreatmentCardController> {
         width: Get.width * 0.8,
         child: Card(
           elevation: 3,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -28,19 +29,29 @@ class TreatmentCard extends GetWidget<TreatmentCardController> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text('Name : ${treatment.name}'),
-                  ElevatedButton(onPressed: (){
-                    TreatmentCardController().update();
-                    FirebaseFirestore.instance.collection('users').doc(AuthController.instance.auth.currentUser?.uid).set({
-                      'treatment':{treatment.name:{'dose': FieldValue.increment(1)}}
-                    },SetOptions(merge: true));
-
-                  }, child: Text('Take Dose'))
+                  ElevatedButton(
+                      onPressed: () {
+                        TreatmentCardController().update();
+                        FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(AuthController.instance.auth.currentUser?.uid)
+                            .set({
+                          'treatment': {
+                            treatment.name: {'dose': FieldValue.increment(1)}
+                          }
+                        }, SetOptions(merge: true));
+                      },
+                      child: Text('Take Dose'))
                 ],
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  CircleAvatar(child: treatment.image,backgroundColor: Colors.transparent,radius: 40,),
+                  CircleAvatar(
+                    child: treatment.image,
+                    backgroundColor: Colors.transparent,
+                    radius: 40,
+                  ),
                   Obx(() => Text('${dosee.value}'))
                 ],
               ),
@@ -53,7 +64,8 @@ class TreatmentCard extends GetWidget<TreatmentCardController> {
 }
 
 class TreatmentCard2 extends GetWidget<TreatmentCardController> {
-   TreatmentCard2({Key? key, required this.treatment, this.userId}) : super(key: key);
+  TreatmentCard2({Key? key, required this.treatment, this.userId})
+      : super(key: key);
 
   final treatment;
   final userId;
@@ -68,7 +80,8 @@ class TreatmentCard2 extends GetWidget<TreatmentCardController> {
         width: Get.width * 0.8,
         child: Card(
           elevation: 3,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -76,19 +89,56 @@ class TreatmentCard2 extends GetWidget<TreatmentCardController> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text('Name : ${TreatmentModel.fromJson(treatment).name}'),
-                  Text('Total Dose : ${TreatmentModel.fromJson(treatment).dose.value}'),
+                  Text('Total Dose : ${TreatmentModel.fromJson(treatment).totalDose}'),
                   Text('Last Dose : ${date.toString().substring(0, 16)}'),
-                  ElevatedButton(onPressed: (){
-                    FirebaseFirestore.instance.collection('users').doc(userId).set({
-                      'treatment': {TreatmentModel.fromJson(treatment).name : FieldValue.delete()}
-                        },SetOptions(merge: true));
-                  }, child: Text(text.value))
+                  if (TreatmentModel.fromJson(treatment).ended == false)
+                    ElevatedButton(
+                      onPressed: () {
+                        Get.defaultDialog(
+                            title: 'Alert !',
+                            content: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text('Are You Sure'),
+                              ),
+                            ),
+                            actions: [
+                              ElevatedButton(
+                                  onPressed: () {
+                                    FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(userId)
+                                        .set({
+                                      'treatment': {
+                                        TreatmentModel.fromJson(treatment).name:
+                                            FieldValue.delete()
+                                      }
+                                    }, SetOptions(merge: true));
+                                    Get.back();
+                                  },
+                                  child: Text('Sure')),
+                              ElevatedButton(
+                                  onPressed: () {
+                                    Get.back();
+                                  },
+                                  child: Text('Cancel')),
+                            ]);
+                      },
+                      child: Text(text.value),
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all<Color>(Colors.red)),
+                    )
                 ],
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  CircleAvatar(child: TreatmentModel.fromJson(treatment).image,backgroundColor: Colors.transparent,radius: 40,),
+                  CircleAvatar(
+                    child: TreatmentModel.fromJson(treatment).image,
+                    backgroundColor: Colors.transparent,
+                    radius: 40,
+                  ),
                 ],
               ),
             ],

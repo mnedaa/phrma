@@ -21,50 +21,21 @@ class HomeController extends GetxController {
   RxString check = 'users'.obs;
   RxBool isBanned = false.obs;
   RxString chosenImage = ''.obs;
+  RxString addAdminImage = ''.obs;
 
   /// Method to stream on users
 
   Stream<List> streamUsers(String userName) {
-    /// if search Field is clear
-    if (userName == '') {
-      FirebaseFirestore.instance
-          .collection('users')
-          .snapshots()
-          .listen((event) {
-        filterUsers.value = event.docs.where((element) => element['role'] == 'user').toList();
-      });
-      return filterUsers.stream;
-    }
-
-    /// Here we can search for a User by his name
-
-    else {
       FirebaseFirestore.instance
           .collection('users')
           .snapshots()
           .listen((event) {
         filterUsers.value = event.docs
             .where((element) =>
-                (element['name'] as String).toLowerCase().contains(userName))
+                (element['name'] as String).toLowerCase().contains(userName) && element['role'] == 'user')
             .toList();
       });
       return filterUsers.stream;
-    }
-  }
-
-  /// Method to stream on new users
-
-  Stream<List> streamNew(String userName) {
-      FirebaseFirestore.instance
-          .collection('users')
-          .snapshots()
-          .listen((event) {
-        filterNewUsers.value = event.docs
-            .where((element) =>
-                (element['name'] as String).toLowerCase().contains(userName) && element['approved'] == false)
-            .toList();
-      });
-      return filterNewUsers.stream;
 
   }
 
@@ -115,6 +86,8 @@ class HomeController extends GetxController {
     return treatmentHistory.stream;
   }
 
+  /// Pick Image
+
   pickImage() async {
     FilePickerResult? result =
     await FilePicker.platform.pickFiles(type: FileType.image);
@@ -126,6 +99,8 @@ class HomeController extends GetxController {
       // User canceled the picker
     }
   }
+
+  /// Add Treatment to User
   
   addTreatment(userId){
     Get.defaultDialog(
@@ -192,6 +167,8 @@ class HomeController extends GetxController {
     );
   }
 
+  /// Ban User
+
   banUser(){
     if(isBanned.value == false){
       Get.defaultDialog(
@@ -242,6 +219,8 @@ class HomeController extends GetxController {
       );
     }
   }
+
+  /// Approve User
 
   approve(id){
     Get.defaultDialog(
