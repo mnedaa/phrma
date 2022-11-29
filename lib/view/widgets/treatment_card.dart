@@ -91,7 +91,7 @@ class TreatmentCard2 extends GetWidget<TreatmentCardController> {
                   Text('Name : ${TreatmentModel.fromJson(treatment).name}'),
                   Text('Total Dose : ${TreatmentModel.fromJson(treatment).totalDose}'),
                   Text('Last Dose : ${date.toString().substring(0, 16)}'),
-                  if (TreatmentModel.fromJson(treatment).ended == false)
+                  TreatmentModel.fromJson(treatment).ended == false ?
                     ElevatedButton(
                       onPressed: () {
                         Get.defaultDialog(
@@ -128,7 +128,8 @@ class TreatmentCard2 extends GetWidget<TreatmentCardController> {
                       style: ButtonStyle(
                           backgroundColor:
                               MaterialStateProperty.all<Color>(Colors.red)),
-                    )
+                    ) :
+                  Text('')
                 ],
               ),
               Column(
